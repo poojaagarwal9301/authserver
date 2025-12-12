@@ -1,17 +1,22 @@
 package com.easyacco.authserver.config;
 
+import com.easyacco.authserver.dto.UserDetailsDTO;
+import com.easyacco.authserver.service.CustomUserDetailsService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,8 +46,10 @@ import java.util.UUID;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
     private static final long EXPIRATION_TIME = 2000 * 60 * 60; // 1 hour
+
+    @Autowired
+    public CustomUserDetailsService customUserDetailsService;
 
     @Bean
     @Order(1)
@@ -52,7 +59,7 @@ public class SecurityConfig {
         http.exceptionHandling(e -> e.authenticationEntryPoint(
                 new LoginUrlAuthenticationEntryPoint("/login")
         ));
-        return http.build();
+        return http .build();
     }
 
     @Bean
@@ -66,13 +73,11 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        var user = User.withUsername("1")
-                .password("1")
-                .authorities("read")
-                .authorities("write")
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
+        return username -> {
+            // Fetch user from DB
+            UserDetails user = customUserDetailsService.loadUserByUsername(username);
+            return user;
+        };
     }
 
     @Bean
@@ -136,6 +141,15 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
         return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
+                                                            PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 
 }
