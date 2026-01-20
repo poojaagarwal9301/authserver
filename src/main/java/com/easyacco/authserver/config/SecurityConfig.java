@@ -72,6 +72,8 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/oauth2/**", config);
+        source.registerCorsConfiguration("/userinfo", config);
+        source.registerCorsConfiguration("/userinfo", config);
 
         return new CorsFilter(source);
     }
@@ -98,7 +100,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(req -> req.requestMatchers(
                         "/.well-known/**",
-                        "/favicon.ico").permitAll()
+                        "/favicon.ico", "/userinfo").permitAll()
 
                         .requestMatchers(
                                 "/oauth2/**",
@@ -221,6 +223,7 @@ public class SecurityConfig {
             Map<String, Object> claims = new HashMap<>();
             claims.put("sub", user.getUsername());
             claims.put("full_name", user.getFullName());
+            claims.put("id", user.getId());
 
             return new OidcUserInfo(claims);
         };

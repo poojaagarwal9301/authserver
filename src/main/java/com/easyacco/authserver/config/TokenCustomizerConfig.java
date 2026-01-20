@@ -28,6 +28,7 @@ public class TokenCustomizerConfig {
 
                 if (principal instanceof CustomUserDetails user) {
                     context.getClaims().claim("full_name", user.getFullName());
+                    context.getClaims().claim("id", user.getId());
                 }
             }
         };

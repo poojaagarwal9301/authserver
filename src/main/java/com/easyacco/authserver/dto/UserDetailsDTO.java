@@ -13,5 +13,6 @@ public class UserDetailsDTO {
     private String userName;
     private String roles;
     private String password;
+    private int userId;
 
 }
