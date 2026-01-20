@@ -30,16 +30,19 @@ import lombok.NoArgsConstructor;
                 @ConstructorResult(
                         targetClass= UserDetailsDTO.class,
                         columns={
+                                @ColumnResult(name="fullName"),
                                 @ColumnResult(name="userName"),
                                 @ColumnResult(name="roles"),
-                                @ColumnResult(name="password")
+                                @ColumnResult(name="password"),
+                                @ColumnResult(name="userId")
                         }
                 )
         }
 )
 
 @NamedNativeQuery(name="getUserDetailsByUserName",
-        query = "select  u.user_name as userName," +
+        query = "select  concat(u.first_name, \" \", u.last_name) as fullName," +
+                "u.user_name as userName, u.user_id as userId," +
                 "GROUP_CONCAT(r.role_name) AS roles, u.password from usr_tbl u " +
                 "join user_roles_tbl ur " +
                 "on u.user_id = ur.user_id join role_tbl r on ur.role_id = r.role_id " +

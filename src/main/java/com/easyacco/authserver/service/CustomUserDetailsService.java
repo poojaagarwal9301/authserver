@@ -1,5 +1,6 @@
 package com.easyacco.authserver.service;
 
+import com.easyacco.authserver.dto.CustomUserDetails;
 import com.easyacco.authserver.dto.UserDetailsDTO;
 import com.easyacco.authserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserDetailsDTO userDetails = userRepository.getUserDetailsByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        return User.withUsername(userDetails.getUserName())
+        return  new CustomUserDetails(userDetails);
+        /*return User.withUsername(userDetails.getUserName())
                 .password(userDetails.getPassword())
                 .authorities(userDetails.getRoles().split(",")) // convert CSV → authorities
-                .build();
+                .build();*/
     }
 }
