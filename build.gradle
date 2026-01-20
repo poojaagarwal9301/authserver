@@ -18,8 +18,19 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+
+	// 🔥 REQUIRED: explicit Authorization Server version
+	implementation 'org.springframework.security:spring-security-oauth2-authorization-server:1.2.2'
+
+	// 🔥 REQUIRED: JWT / OIDC support
+	implementation 'org.springframework.security:spring-security-oauth2-jose'
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'mysql:mysql-connector-java:8.0.28'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
